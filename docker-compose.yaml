@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    container_name: APP
+    ports:
+      - "$APP_PORT:7200"
+    depends_on:
+      - DB
+
+  DB:
+    container_name: DB
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=12345678
+    ports:
+      - "5432:5432"
+
