@@ -1,21 +1,38 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <title>Автобаза - Диспетчер</title>
-</head>
-<body>
-    <h1>Активні заявки</h1>
-    <ul>
-        {% for req in requests %}
-            <li>
-                <strong>Заявка #{{ req.id }}</strong>: {{ req.destination }}
-                (Потрібно: {{ req.required_value }} {{ req.required_type }})
-                <span class="status-{{ req.status }}">{{ req.status }}</span>
-            </li>
-        {% else %}
-            <li>Заявок поки немає.</li>
-        {% endfor %}
-    </ul>
-    <a href="/cars">Переглянути парк авто</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Головна - Автобаза{% endblock %}
+
+{% block content %}
+    <h2>Управління заявками на рейси</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID Заявки</th>
+                <th>Пункт призначення</th>
+                <th>Тип вантажу</th>
+                <th>Об'єм / Місця</th>
+                <th>Статус</th>
+                <th>Дія</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>#{{ req.id }}</td>
+                <td><strong>{{ req.destination }}</strong></td>
+                <td>{{ req.required_type }}</td>
+                <td>{{ req.required_value }}</td>
+                <td><span class="badge badge-pending">{{ req.status }}</span></td>
+                <td>
+                    <a href="/assign?req_id={{ req.id }}" class="btn">Призначити авто</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: #7f8c8d;">Наразі нових заявок немає.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

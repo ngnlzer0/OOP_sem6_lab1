@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Парк Авто - Автобаза{% endblock %}
+
+{% block content %}
+    <h2>Наш автопарк</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Модель</th>
+                <th>Тип автомобіля</th>
+                <th>Пальне</th>
+                <th>Місткість / Вантажопідйомність</th>
+                <th>Технічний стан</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for car in cars %}
+            <tr>
+                <td><strong>{{ car.model }}</strong></td>
+                <td>{{ 'Пасажирський' if car.car_type == 'passenger' else 'Вантажний' }}</td>
+                <td>{{ car.fuel_level }}%</td>
+                <td>
+                    {% if car.car_type == 'passenger' %}
+                        {{ car.seats }} місць
+                    {% else %}
+                        {{ car.load_capacity }} кг
+                    {% endif %}
+                </td>
+                <td>
+                    {% if car.condition %}
+                        <span class="badge badge-ok">Справний</span>
+                    {% else %}
+                        <span class="badge badge-error">В ремонті</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">Немає даних про автомобілі.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

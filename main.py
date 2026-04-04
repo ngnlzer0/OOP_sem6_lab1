@@ -41,6 +41,14 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             self.render_login()
             return
 
+        if self.path == '/logout':
+            self.send_response(302)
+            # Встановлюємо Cookie з минулою датою, щоб браузер її видалив
+            self.send_header('Set-Cookie', 'session_id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
+            self.send_header('Location', '/login')
+            self.end_headers()
+            return
+
         # 2. Middleware аутентифікації
         user_data = self.check_auth()
         if not user_data:
