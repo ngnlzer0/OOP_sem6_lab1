@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <title>Автобаза - Диспетчер</title>
+</head>
+<body>
+    <h1>Активні заявки</h1>
+    <ul>
+        {% for req in requests %}
+            <li>
+                <strong>Заявка #{{ req.id }}</strong>: {{ req.destination }}
+                (Потрібно: {{ req.required_value }} {{ req.required_type }})
+                <span class="status-{{ req.status }}">{{ req.status }}</span>
+            </li>
+        {% else %}
+            <li>Заявок поки немає.</li>
+        {% endfor %}
+    </ul>
+    <a href="/cars">Переглянути парк авто</a>
+</body>
+</html>
