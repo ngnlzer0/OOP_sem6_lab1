@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Призначення рейсу - Автобаза{% endblock %}
+
+{% block content %}
+    <h2>Призначення авто на заявку #{{ request.id }}</h2>
+
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <strong>Маршрут:</strong> {{ request.destination }} <br>
+        <strong>Вимоги:</strong> {{ request.required_value }} {{ request.required_type }}
+    </div>
+
+    <form action="/assign" method="POST" style="max-width: 400px;">
+        <input type="hidden" name="request_id" value="{{ request.id }}">
+
+        <div style="margin-bottom: 15px;">
+            <label for="car_id"><strong>Оберіть автомобіль:</strong></label><br>
+            <select name="car_id" id="car_id" style="width: 100%; padding: 8px;" required>
+                <option value="">-- Виберіть авто --</option>
+                {% for car in valid_cars %}
+                    <option value="{{ car.id }}">
+                        {{ car.model }} (Доступно:
+                        {% if car.car_type == 'passenger' %}{{ car.seats }} місць
+                        {% else %}{{ car.load_capacity }} кг{% endif %})
+                    </option>
+                {% else %}
+                    <option value="" disabled>Немає підходящих справних авто</option>
+                {% endfor %}
+            </select>
+            <small style="color: gray;">* Показані лише авто, що підходять під вимоги</small>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="driver_id"><strong>Оберіть водія:</strong></label><br>
+            <select name="driver_id" id="driver_id" style="width: 100%; padding: 8px;" required>
+                <option value="1">Водій 1 (Іваненко)</option>
+                <option value="2">Водій 2 (Петренко)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; background: #2ecc71;">Підтвердити рейс</button>
+        <a href="/" style="display: block; text-align: center; margin-top: 10px; color: #7f8c8d;">Скасувати</a>
+    </form>
+{% endblock %}

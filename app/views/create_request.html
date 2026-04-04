@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Нова заявка - Автобаза{% endblock %}
+
+{% block content %}
+    <h2>Створення нової заявки</h2>
+
+    <form action="/create_request" method="POST" style="max-width: 400px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <div style="margin-bottom: 15px;">
+            <label><strong>Пункт призначення:</strong></label><br>
+            <input type="text" name="destination" required style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label><strong>Тип вантажу/перевезення:</strong></label><br>
+            <select name="required_type" style="width: 100%; padding: 8px; margin-top: 5px;">
+                <option value="passenger">Пасажирський (люди)</option>
+                <option value="cargo">Вантажний (кг)</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label><strong>Кількість місць або Вага (кг):</strong></label><br>
+            <input type="number" name="required_value" min="1" required style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; background: #2ecc71;">Додати заявку</button>
+        <a href="/" style="display: block; text-align: center; margin-top: 10px; color: #7f8c8d; text-decoration: none;">Скасувати</a>
+    </form>
+{% endblock %}

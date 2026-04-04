@@ -3,8 +3,11 @@
 {% block title %}Головна - Автобаза{% endblock %}
 
 {% block content %}
-    <h2>Управління заявками на рейси</h2>
-    
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Управління заявками на рейси</h2>
+        <a href="/create_request" class="btn" style="background-color: #2ecc71;">+ Додати заявку</a>
+    </div>
+
     <table>
         <thead>
             <tr>
