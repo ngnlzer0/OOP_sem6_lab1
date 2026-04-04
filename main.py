@@ -36,7 +36,6 @@ class AutobazaHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """Власний Routing для GET-запитів"""
 
-        # 1. Відкриті маршрути
         if self.path == '/login':
             self.render_login()
             return
