@@ -133,3 +133,18 @@ class RequestController:
         handler.send_response(302)
         handler.send_header('Location', '/my_trips')
         handler.end_headers()
+
+    def get_history(self, handler):
+        from app.DAO.trip_dao import TripDAO
+        try:
+            dao = TripDAO(self.db_url)
+            trips = dao.get_all_trips_history()
+            template = self.env.get_template('history.html')
+
+            handler.send_response(200)
+            handler.send_header("Content-type", "text/html; charset=utf-8")
+            handler.end_headers()
+            # Передаємо user_role='dispatcher', щоб бачити повне меню
+            handler.wfile.write(template.render(trips=trips, user_role='dispatcher').encode('utf-8'))
+        except Exception as e:
+            handler.send_error(500, f"Error: {e}")

@@ -56,6 +56,11 @@ class AutobazaHandler(BaseHTTPRequestHandler):
                 driver_ctrl.render_link_form(self)
             else:
                 self.send_error(403, "Forbidden")
+        elif self.path == '/history':
+            if user and user['role'] == 'dispatcher':
+                req_ctrl.get_history(self)
+            else:
+                self.send_error(403, "Forbidden")
         else:
             self.send_error(404, "Not Found") # Виправили на англійську
 

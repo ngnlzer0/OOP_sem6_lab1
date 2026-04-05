@@ -64,3 +64,30 @@ class TripDAO:
             with conn.cursor() as cur:
                 cur.execute(query, (request_id, car_id))
                 conn.commit()
+
+    def get_all_trips_history(self):
+        """Отримує повну історію всіх рейсів для журналу"""
+        query = """
+            SELECT t.id, r.destination, u.login as driver_name, c.model as car_model, 
+                   t.is_completed, t.finished_at
+            FROM trip t
+            JOIN request r ON t.request_id = r.id
+            JOIN driver d ON t.driver_id = d.id
+            JOIN "user" u ON d.user_id = u.id
+            JOIN car c ON d.car_id = c.id
+            ORDER BY t.id DESC
+        """
+        history = []
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+                for row in cur.fetchall():
+                    history.append({
+                        'id': row[0],
+                        'destination': row[1],
+                        'driver': row[2],
+                        'car': row[3],
+                        'is_completed': row[4],
+                        'finished_at': row[5].strftime('%Y-%m-%d %H:%M') if row[5] else 'В процесі'
+                    })
+        return history

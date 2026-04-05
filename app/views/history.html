@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Журнал рейсів - Автобаза{% endblock %}
+{% block content %}
+    <h2>Журнал рейсів (Архів)</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Маршрут</th>
+            <th>Водій</th>
+            <th>Автомобіль</th>
+            <th>Дата завершення</th>
+            <th>Статус</th>
+        </tr>
+        {% for trip in trips %}
+        <tr>
+            <td>#{{ trip.id }}</td>
+            <td>{{ trip.destination }}</td>
+            <td>{{ trip.driver }}</td>
+            <td>{{ trip.car }}</td>
+            <td>{{ trip.finished_at }}</td>
+            <td>
+                {% if trip.is_completed %}
+                    <span style="color: #27ae60; font-weight: bold;">✅ Завершено</span>
+                {% else %}
+                    <span style="color: #2980b9; font-weight: bold;">🚚 В дорозі</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+            <tr><td colspan="6" style="text-align: center;">Жодних рейсів ще не було створено.</td></tr>
+        {% endfor %}
+    </table>
+{% endblock %}
