@@ -120,7 +120,8 @@ class RequestController:
         parsed_data = urllib.parse.parse_qs(post_data)
         trip_id = int(parsed_data.get('trip_id', [0])[0])
         # Якщо з форми прийшло 'true', стан True, інакше False
-        condition_str = parsed_data.get('car_condition', ['true'])[0]
+        # Надійно перетворюємо те, що прийшло з HTML, у булеве значення
+        condition_str = str(parsed_data.get('car_condition', ['true'])[0]).strip().lower()
         car_condition = (condition_str == 'true')
 
         try:

@@ -5,24 +5,29 @@ import psycopg
 
 
 class CarDAO(BaseDAO):
-    def get_all(self):
+    def get_all_cars(self):
+        """Отримує всі авто з усією інформацією для сторінки автопарку"""
         query = """
-            SELECT c.id, c.model, c.type, c.condition, c.fuel_level, 
-                   p.seats, cg.load_capacity
+            SELECT c.id, c.model, c.type, c.fuel_level, c.condition,
+                   pc.seats, cc.load_capacity
             FROM car c
-            LEFT JOIN passenger_car p ON c.id = p.car_id
-            LEFT JOIN cargo_car cg ON c.id = cg.car_id
+            LEFT JOIN passenger_car pc ON c.id = pc.car_id
+            LEFT JOIN cargo_car cc ON c.id = cc.car_id
+            ORDER BY c.id ASC
         """
         cars = []
         with self.get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(query)
                 for row in cur.fetchall():
-                    # row mapping: 0:id, 1:model, 2:type, 3:cond, 4:fuel, 5:seats, 6:load
-                    if row[2] == 'passenger':
-                        cars.append(PassengerCar(row[0], row[1], row[3], row[4], row[5]))
-                    elif row[2] == 'cargo':
-                        cars.append(CargoCar(row[0], row[1], row[3], row[4], row[6]))
+                    cars.append({
+                        'id': row[0],
+                        'model': row[1],
+                        'type': 'Пасажирський' if row[2] == 'passenger' else 'Вантажний',
+                        'fuel_level': row[3],
+                        'condition': row[4],
+                        'capacity': f"{row[5]} місць" if row[2] == 'passenger' else f"{row[6]} кг"
+                    })
         return cars
 
     def update_condition(self, car_id, condition):

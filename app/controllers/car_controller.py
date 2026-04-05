@@ -8,17 +8,18 @@ class CarController:
         self.db_url = db_url
 
     def get_cars(self, handler):
-        """Обробка GET /cars"""
+        from app.DAO.car_dao import CarDAO
         try:
             dao = CarDAO(self.db_url)
-            all_cars = dao.get_all()
+            # Викликаємо оновлений метод
+            cars = dao.get_all_cars()
             template = self.env.get_template('cars.html')
-            output = template.render(cars=all_cars)
 
             handler.send_response(200)
             handler.send_header("Content-type", "text/html; charset=utf-8")
             handler.end_headers()
-            handler.wfile.write(output.encode('utf-8'))
+            # Додаємо user_role, щоб навігація диспетчера працювала
+            handler.wfile.write(template.render(cars=cars, user_role='dispatcher').encode('utf-8'))
         except Exception as e:
             handler.send_error(500, f"Помилка БД: {e}")
 
