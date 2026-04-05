@@ -26,14 +26,21 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             return auth_ctrl.logout(self)
 
         # 2. Middleware аутентифікації
-        # Якщо check_auth повертає False (сесії немає), метод завершується (return)
         if not auth_ctrl.check_auth(self):
-            # Отримуємо поточного користувача
-            user = auth_ctrl.get_current_user(self)
+            return
+
+        # Дістаємо дані користувача з сесії
+        user = auth_ctrl.get_current_user(self)
 
         # 3. Захищені маршрути
         if self.path == '/':
             req_ctrl.get_home(self)
+        elif self.path == '/my_trips':
+            # Перевіряємо, чи це водій
+            if user and user['role'] == 'driver':
+                req_ctrl.get_my_trips(self, user['id'])
+            else:
+                self.send_error(403, "Forbidden") # Виправили на англійську
         elif self.path == '/create_request':
             req_ctrl.render_create_form(self)
         elif self.path.startswith('/assign'):
@@ -43,7 +50,7 @@ class AutobazaHandler(BaseHTTPRequestHandler):
         elif self.path == '/create_car':
             car_ctrl.render_create_form(self)
         else:
-            self.send_error(404, "Сторінку не знайдено")
+            self.send_error(404, "Not Found") # Виправили на англійську
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
