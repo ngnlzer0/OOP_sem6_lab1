@@ -2,6 +2,8 @@ import uuid
 import urllib.parse
 from http.cookies import SimpleCookie
 from app.DAO.user_dao import UserDAO
+import uuid
+import urllib.parse
 
 
 class AuthController:
@@ -33,9 +35,6 @@ class AuthController:
         handler.wfile.write(template.render(error=error).encode('utf-8'))
 
     def login(self, handler, post_data):
-        import uuid
-        import urllib.parse
-        from app.dao.user_dao import UserDAO
 
         # Беремо URL бази даних з контролера (або можна передавати з main.py)
         # Для простоти поки захардкодимо підключення тут, або використай константу
