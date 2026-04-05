@@ -60,20 +60,22 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             self.send_error(404, "Not Found") # Виправили на англійську
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
+        content_length = int(self.headers.get('Content-Length', 0))
         post_data = self.rfile.read(content_length).decode('utf-8')
 
-        # Відкритий POST-маршрут
         # Відкриті POST-маршрути
         if self.path == '/login':
             return auth_ctrl.login(self, post_data)
         if self.path == '/register':
             return auth_ctrl.register(self, post_data)
+
         # Middleware
         if not auth_ctrl.check_auth(self):
-            self.send_response(403)
-            self.end_headers()
+            self.send_error(403, "Forbidden")
             return
+
+        # Отримуємо поточного користувача для перевірки ролей
+        user = auth_ctrl.get_current_user(self)
 
         # Захищені POST-маршрути
         if self.path == '/create_request':
@@ -84,8 +86,14 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             car_ctrl.create_car(self, post_data)
         elif self.path == '/link_driver':
             driver_ctrl.create_link(self, post_data)
+        elif self.path == '/complete_trip':
+            if user and user['role'] == 'driver':
+                req_ctrl.complete_trip(self, post_data)
+            else:
+                self.send_error(403, "Forbidden")
         else:
-            self.send_error(404, "Сторінку не знайдено")
+            # Виправили кирилицю, щоб не було UnicodeEncodeError!
+            self.send_error(404, "Not Found")
 
 if __name__ == "__main__":
     port = int(os.environ.get('APP_PORT', 7200))
