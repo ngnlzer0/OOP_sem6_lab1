@@ -23,3 +23,11 @@ class RequestDAO(BaseDAO):
             with conn.cursor() as cur:
                 cur.execute(query, (required_type, required_value, destination))
                 conn.commit()
+
+    def update_status(self, req_id, new_status):
+        """Змінює статус заявки (наприклад, на 'assigned' або 'completed')"""
+        query = "UPDATE request SET status = %s WHERE id = %s"
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (new_status, req_id))
+                conn.commit()

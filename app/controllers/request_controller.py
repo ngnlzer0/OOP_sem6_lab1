@@ -70,14 +70,26 @@ class RequestController:
             handler.send_error(500, f"Помилка: {e}")
 
     def assign_request(self, handler, post_data):
+        import urllib.parse
+        from app.DAO.trip_dao import TripDAO
+        from app.DAO.request_dao import RequestDAO
+
         parsed_data = urllib.parse.parse_qs(post_data)
         req_id = int(parsed_data.get('request_id', [0])[0])
         car_id = int(parsed_data.get('car_id', [0])[0])
-        driver_id = int(parsed_data.get('driver_id', [0])[0])
 
-        # TODO: Запис у TripDAO (зробимо на наступному кроці)
-        print(f"Створюємо рейс: Заявка={req_id}, Авто={car_id}, Водій={driver_id}")
+        try:
+            # 1. Створюємо рейс (автоматично підтягне водія)
+            trip_dao = TripDAO(self.db_url)
+            trip_dao.create_trip_by_car(req_id, car_id)
 
+            # 2. Змінюємо статус заявки, щоб вона не висіла як 'pending'
+            req_dao = RequestDAO(self.db_url)
+            req_dao.update_status(req_id, 'assigned')
+        except Exception as e:
+            print(f"Помилка створення рейсу: {e}")
+
+        # Повертаємо диспетчера на головну сторінку
         handler.send_response(302)
         handler.send_header('Location', '/')
         handler.end_headers()
