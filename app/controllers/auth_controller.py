@@ -11,6 +11,16 @@ class AuthController:
         self.env = template_env
         self.sessions = {}  # Інкапсулюємо сховище сесій тут
 
+    def get_current_user(self, handler):
+        from http.cookies import SimpleCookie
+        cookie_header = handler.headers.get('Cookie')
+        if cookie_header:
+            cookie = SimpleCookie(cookie_header)
+            if 'session_id' in cookie:
+                session_id = cookie['session_id'].value
+                return self.sessions.get(session_id)
+        return None
+
     def check_auth(self, handler):
         """Перевіряє, чи авторизований користувач. Якщо ні - робить редирект і повертає False."""
         cookie_header = handler.headers.get('Cookie')
