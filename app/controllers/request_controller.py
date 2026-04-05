@@ -43,6 +43,10 @@ class RequestController:
         handler.end_headers()
 
     def render_assign_form(self, handler):
+        import urllib.parse
+        from app.DAO.request_dao import RequestDAO
+        from app.DAO.car_dao import CarDAO
+
         try:
             query_components = urllib.parse.parse_qs(urllib.parse.urlparse(handler.path).query)
             req_id = int(query_components.get('req_id', [0])[0])
@@ -50,24 +54,25 @@ class RequestController:
             req_dao = RequestDAO(self.db_url)
             car_dao = CarDAO(self.db_url)
 
+            # Знаходимо поточну заявку
             all_reqs = req_dao.get_all_pending()
             current_request = next((r for r in all_reqs if r.id == req_id), None)
 
             if not current_request:
-                handler.send_error(404, "Заявку не знайдено")
+                handler.send_error(404, "Not Found")
                 return
 
-            all_cars = car_dao.get_all()
-            valid_cars = [car for car in all_cars if car.validate_for_request(current_request)]
+            # Використовуємо наш новий SQL-метод
+            valid_cars = car_dao.get_cars_for_assignment(current_request.required_type, current_request.required_value)
 
             template = self.env.get_template('assign.html')
-
             handler.send_response(200)
             handler.send_header("Content-type", "text/html; charset=utf-8")
             handler.end_headers()
             handler.wfile.write(template.render(request=current_request, valid_cars=valid_cars).encode('utf-8'))
         except Exception as e:
-            handler.send_error(500, f"Помилка: {e}")
+            handler.send_error(500, f"Error: {e}")
+
 
     def assign_request(self, handler, post_data):
         import urllib.parse
@@ -107,3 +112,23 @@ class RequestController:
             handler.wfile.write(template.render(trips=trips).encode('utf-8'))
         except Exception as e:
             handler.send_error(500, f"Помилка БД: {e}")
+
+    def complete_trip(self, handler, post_data):
+        import urllib.parse
+        from app.DAO.trip_dao import TripDAO
+
+        parsed_data = urllib.parse.parse_qs(post_data)
+        trip_id = int(parsed_data.get('trip_id', [0])[0])
+        # Якщо з форми прийшло 'true', стан True, інакше False
+        condition_str = parsed_data.get('car_condition', ['true'])[0]
+        car_condition = (condition_str == 'true')
+
+        try:
+            dao = TripDAO(self.db_url)
+            dao.complete_trip(trip_id, car_condition)
+        except Exception as e:
+            print(f"Помилка завершення рейсу: {e}")
+
+        handler.send_response(302)
+        handler.send_header('Location', '/my_trips')
+        handler.end_headers()

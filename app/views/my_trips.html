@@ -18,9 +18,16 @@
                 <td>{{ trip.destination }}</td>
                 <td>{{ trip.required_type }}</td>
                 <td>{{ trip.required_value }}</td>
-                <td>
-                    <button class="btn" style="background-color: #27ae60;">Завершити рейс</button>
-                </td>
+              <td>
+    <form action="/complete_trip" method="POST" style="display: flex; gap: 10px;">
+        <input type="hidden" name="trip_id" value="{{ trip.id }}">
+        <select name="car_condition" required style="padding: 5px;">
+            <option value="true">Авто справне</option>
+            <option value="false">Потребує ремонту</option>
+        </select>
+        <button type="submit" class="btn" style="background-color: #27ae60; margin: 0;">Завершити</button>
+    </form>
+</td>
             </tr>
             {% endfor %}
         </table>

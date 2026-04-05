@@ -52,3 +52,31 @@ class CarDAO(BaseDAO):
                     cur.execute(query_sub, (new_car_id, float(capacity)))
 
                 conn.commit()
+
+    def get_cars_for_assignment(self, req_type, req_value):
+        """Шукає справні авто потрібного типу, які мають водія і підходять за місткістю"""
+        query = """
+            SELECT c.id, c.model, u.login as driver_name
+            FROM car c
+            JOIN driver d ON c.id = d.car_id
+            JOIN "user" u ON d.user_id = u.id
+            LEFT JOIN passenger_car pc ON c.id = pc.car_id
+            LEFT JOIN cargo_car cc ON c.id = cc.car_id
+            WHERE c.condition = true 
+              AND c.type = %s
+              AND (
+                  (c.type = 'passenger' AND pc.seats >= %s) OR 
+                  (c.type = 'cargo' AND cc.load_capacity >= %s)
+              )
+        """
+        valid_cars = []
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (req_type, req_value, req_value))
+                for row in cur.fetchall():
+                    valid_cars.append({
+                        'id': row[0],
+                        'model': row[1],
+                        'driver_name': row[2]
+                    })
+        return valid_cars
