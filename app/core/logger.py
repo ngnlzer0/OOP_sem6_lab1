@@ -9,7 +9,6 @@ def setup_logger():
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-    # Вивід у консоль (для Docker logs на AWS)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)

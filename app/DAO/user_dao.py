@@ -43,5 +43,4 @@ class UserDAO:
                     conn.commit()
                     return new_id
         except psycopg.IntegrityError:
-            # Спрацює, якщо логін не унікальний (порушення UNIQUE constraint)
             return None

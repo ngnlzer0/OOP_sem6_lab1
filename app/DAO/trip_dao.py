@@ -31,7 +31,6 @@ class TripDAO:
 
     def complete_trip(self, trip_id, car_condition):
         """Завершує рейс і оновлює стан авто"""
-        # Розбиваємо на три окремі запити
         query1 = "UPDATE trip SET is_completed = true, finished_at = NOW() WHERE id = %s"
 
         query2 = """
@@ -46,12 +45,9 @@ class TripDAO:
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                # Виконуємо їх по черзі
                 cur.execute(query1, (trip_id,))
                 cur.execute(query2, (trip_id,))
                 cur.execute(query3, (car_condition, trip_id))
-
-                # І тільки після цього зберігаємо всі зміни разом
                 conn.commit()
 
     def create_trip_by_car(self, request_id, car_id):

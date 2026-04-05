@@ -6,24 +6,20 @@ from app.DAO.car_dao import CarDAO
 
 logger = logging.getLogger(__name__)
 
-
 class CarController:
     def __init__(self, template_env, db_url):
         self.env = template_env
         self.db_url = db_url
 
     def get_cars(self, handler):
-        from app.DAO.car_dao import CarDAO
         try:
             dao = CarDAO(self.db_url)
-            # Викликаємо оновлений метод
             cars = dao.get_all_cars()
             template = self.env.get_template('cars.html')
 
             handler.send_response(200)
             handler.send_header("Content-type", "text/html; charset=utf-8")
             handler.end_headers()
-            # Додаємо user_role, щоб навігація диспетчера працювала
             handler.wfile.write(template.render(cars=cars, user_role='dispatcher').encode('utf-8'))
         except Exception as e:
             logger.error(f"Помилка БД при створенні авто: {e}")
@@ -49,7 +45,6 @@ class CarController:
         except Exception as e:
             logger.error(f"Помилка БД при створенні авто: {e}")
 
-        # Після додавання перекидаємо назад в автопарк
         handler.send_response(302)
         handler.send_header('Location', '/cars')
         handler.end_headers()

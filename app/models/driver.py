@@ -3,4 +3,4 @@ class Driver:
         self.id = id
         self.user_id = user_id
         self.car_id = car_id
-        self.active_trip = None # Стан водія
+        self.active_trip = None

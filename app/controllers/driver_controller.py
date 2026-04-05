@@ -4,7 +4,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class DriverController:
     def __init__(self, template_env, db_url):
         self.env = template_env
@@ -13,7 +12,6 @@ class DriverController:
     def render_link_form(self, handler):
         try:
             dao = DriverDAO(self.db_url)
-            # Дістаємо списки для випадаючих меню у формі
             users = dao.get_unassigned_users()
             cars = dao.get_available_cars()
 
@@ -38,7 +36,6 @@ class DriverController:
         except Exception as e:
             logger.error(f"Помилка закріплення водія: {e}")
 
-        # Повертаємо на головну
         handler.send_response(302)
         handler.send_header('Location', '/')
         handler.end_headers()

@@ -3,7 +3,7 @@ from app.models.request import Request
 
 class RequestDAO(BaseDAO):
     def get_all_pending(self):
-        """Отримання всіх нових заявок [cite: 20]"""
+        """Отримання всіх нових заявок """
         query = "SELECT id, required_type, required_value, destination, status FROM request WHERE status = 'pending'"
         requests = []
         with self.get_connection() as conn:

@@ -1,8 +1,7 @@
-# app/dao/car_dao.py
-from app.DAO.base_dao import BaseDAO
-from app.models.car import PassengerCar, CargoCar
 import psycopg
 
+from app.DAO.base_dao import BaseDAO
+from app.models.car import PassengerCar, CargoCar
 
 class CarDAO(BaseDAO):
     def get_all_cars(self):
@@ -31,7 +30,6 @@ class CarDAO(BaseDAO):
         return cars
 
     def update_condition(self, car_id, condition):
-        """Приклад маніпуляції даними (Update) через SQL """
         query = "UPDATE car SET condition = %s WHERE id = %s"
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -39,7 +37,6 @@ class CarDAO(BaseDAO):
                 conn.commit()
 
     def create_car(self, model, car_type, fuel_level, capacity):
-        # RETURNING id дозволяє нам одразу отримати згенерований ID нового авто
         query_car = "INSERT INTO car (model, type, fuel_level) VALUES (%s, %s, %s) RETURNING id"
 
         with self.get_connection() as conn:

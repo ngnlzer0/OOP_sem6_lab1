@@ -10,14 +10,12 @@ from app.controllers.request_controller import RequestController
 from app.controllers.driver_controller import DriverController
 
 
-# Налаштовуємо базовий формат логування
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)-8s | %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-# Створюємо об'єкт логера для цього файлу
 logger = logging.getLogger(__name__)
 
 DB_URL = "dbname=test_app user=midnight password=12345678 host=DB"
@@ -75,7 +73,7 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             else:
                 self.send_error(403, "Forbidden")
         else:
-            self.send_error(404, "Not Found") # Виправили на англійську
+            self.send_error(404, "Not Found")
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length', 0))
@@ -110,7 +108,6 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             else:
                 self.send_error(403, "Forbidden")
         else:
-            # Виправили кирилицю, щоб не було UnicodeEncodeError!
             self.send_error(404, "Not Found")
 
 if __name__ == "__main__":

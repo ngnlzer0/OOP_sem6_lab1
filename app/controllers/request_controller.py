@@ -7,7 +7,6 @@ from app.DAO.trip_dao import TripDAO
 
 logger = logging.getLogger(__name__)
 
-
 class RequestController:
     def __init__(self, template_env, db_url):
         self.env = template_env
@@ -63,7 +62,6 @@ class RequestController:
                 handler.send_error(404, "Not Found")
                 return
 
-            # Використовуємо наш новий SQL-метод
             valid_cars = car_dao.get_cars_for_assignment(current_request.required_type, current_request.required_value)
 
             template = self.env.get_template('assign.html')
@@ -82,17 +80,14 @@ class RequestController:
         car_id = int(parsed_data.get('car_id', [0])[0])
 
         try:
-            # 1. Створюємо рейс (автоматично підтягне водія)
             trip_dao = TripDAO(self.db_url)
             trip_dao.create_trip_by_car(req_id, car_id)
 
-            # 2. Змінюємо статус заявки, щоб вона не висіла як 'pending'
             req_dao = RequestDAO(self.db_url)
             req_dao.update_status(req_id, 'assigned')
         except Exception as e:
             logger.error(f"Помилка створення рейсу: {e}")
 
-        # Повертаємо диспетчера на головну сторінку
         handler.send_response(302)
         handler.send_header('Location', '/')
         handler.end_headers()
@@ -114,8 +109,6 @@ class RequestController:
 
         parsed_data = urllib.parse.parse_qs(post_data)
         trip_id = int(parsed_data.get('trip_id', [0])[0])
-        # Якщо з форми прийшло 'true', стан True, інакше False
-        # Надійно перетворюємо те, що прийшло з HTML, у булеве значення
         condition_str = str(parsed_data.get('car_condition', ['true'])[0]).strip().lower()
         car_condition = (condition_str == 'true')
 
@@ -138,7 +131,6 @@ class RequestController:
             handler.send_response(200)
             handler.send_header("Content-type", "text/html; charset=utf-8")
             handler.end_headers()
-            # Передаємо user_role='dispatcher', щоб бачити повне меню
             handler.wfile.write(template.render(trips=trips, user_role='dispatcher').encode('utf-8'))
         except Exception as e:
             handler.send_error(500, f"Error: {e}")
