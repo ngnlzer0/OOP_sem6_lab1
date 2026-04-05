@@ -28,7 +28,8 @@ class AutobazaHandler(BaseHTTPRequestHandler):
         # 2. Middleware аутентифікації
         # Якщо check_auth повертає False (сесії немає), метод завершується (return)
         if not auth_ctrl.check_auth(self):
-            return
+            # Отримуємо поточного користувача
+            user = auth_ctrl.get_current_user(self)
 
         # 3. Захищені маршрути
         if self.path == '/':

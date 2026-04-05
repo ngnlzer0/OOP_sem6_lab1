@@ -1,15 +1,30 @@
-# app/dao/trip_dao.py
-from app.DAO.base_dao import BaseDAO
+import psycopg
 
-class TripDAO(BaseDAO):
-    def create_trip(self, request_id, driver_id):
+class TripDAO:
+    def __init__(self, db_url):
+        self.db_url = db_url
+
+    def get_connection(self):
+        return psycopg.connect(self.db_url)
+
+    def get_driver_trips(self, user_id):
+        """Отримує активні рейси для водія на основі його user_id"""
         query = """
-            INSERT INTO trip (request_id, driver_id, is_completed, started_at)
-            VALUES (%s, %s, FALSE, NOW()) RETURNING id
+            SELECT t.id, r.destination, r.required_type, r.required_value
+            FROM trip t
+            JOIN request r ON t.request_id = r.id
+            JOIN driver d ON t.driver_id = d.id
+            WHERE d.user_id = %s AND t.is_completed = false
         """
+        trips = []
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (request_id, driver_id))
-                trip_id = cur.fetchone()[0]
-                conn.commit()
-                return trip_id
+                cur.execute(query, (user_id,))
+                for row in cur.fetchall():
+                    trips.append({
+                        'id': row[0],
+                        'destination': row[1],
+                        'required_type': row[2],
+                        'required_value': row[3]
+                    })
+        return trips

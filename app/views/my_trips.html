@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Мої рейси - Автобаза{% endblock %}
+{% block content %}
+    <h2>Мій кабінет (Активні рейси)</h2>
+
+    {% if trips %}
+        <table>
+            <tr>
+                <th>ID Рейсу</th>
+                <th>Пункт призначення</th>
+                <th>Тип вантажу</th>
+                <th>Кількість/Об'єм</th>
+                <th>Дія</th>
+            </tr>
+            {% for trip in trips %}
+            <tr>
+                <td>#{{ trip.id }}</td>
+                <td>{{ trip.destination }}</td>
+                <td>{{ trip.required_type }}</td>
+                <td>{{ trip.required_value }}</td>
+                <td>
+                    <button class="btn" style="background-color: #27ae60;">Завершити рейс</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            У вас наразі немає активних рейсів. Відпочивайте!
+        </p>
+    {% endif %}
+{% endblock %}

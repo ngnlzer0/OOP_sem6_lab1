@@ -105,3 +105,15 @@ class AuthController:
         else:
             # Якщо логін вже зайнятий
             self.render_register(handler, error="Цей логін вже зайнятий. Виберіть інший.")
+
+        # Додай цей метод всередину класу AuthController
+        def get_current_user(self, handler):
+            """Повертає дані поточного користувача із сесії"""
+            from http.cookies import SimpleCookie
+            cookie_header = handler.headers.get('Cookie')
+            if cookie_header:
+                cookie = SimpleCookie(cookie_header)
+                if 'session_id' in cookie:
+                    session_id = cookie['session_id'].value
+                    return self.sessions.get(session_id)
+            return None

@@ -81,3 +81,18 @@ class RequestController:
         handler.send_response(302)
         handler.send_header('Location', '/')
         handler.end_headers()
+
+        # Додай цей метод всередину класу RequestController
+        def get_my_trips(self, handler, user_id):
+            from app.DAO.trip_dao import TripDAO
+            try:
+                dao = TripDAO(self.db_url)
+                trips = dao.get_driver_trips(user_id)
+                template = self.env.get_template('my_trips.html')
+
+                handler.send_response(200)
+                handler.send_header("Content-type", "text/html; charset=utf-8")
+                handler.end_headers()
+                handler.wfile.write(template.render(trips=trips).encode('utf-8'))
+            except Exception as e:
+                handler.send_error(500, f"Помилка БД: {e}")
