@@ -1,3 +1,4 @@
 psycopg[binary]
 jinja2
 pytest
+psycopg2-binary

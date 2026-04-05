@@ -1,20 +1,18 @@
 # app/dao/user_dao.py
-import psycopg2
-
+import psycopg
 
 class UserDAO:
     def __init__(self, db_url):
         self.db_url = db_url
 
     def get_connection(self):
-        return psycopg2.connect(self.db_url)
+        return psycopg.connect(self.db_url)
 
     def authenticate(self, login, password):
         """
         Перевіряє користувача в базі даних.
         Повертає словник з даними (id, login, role) або None.
         """
-        # Зверни увагу: слово "user" в лапках, бо це зарезервоване слово в SQL
         query = 'SELECT id, login, role FROM "user" WHERE login = %s AND password_hash = %s'
 
         with self.get_connection() as conn:
@@ -44,6 +42,6 @@ class UserDAO:
                     new_id = cur.fetchone()[0]
                     conn.commit()
                     return new_id
-        except psycopg2.IntegrityError:
+        except psycopg.IntegrityError:
             # Спрацює, якщо логін не унікальний (порушення UNIQUE constraint)
             return None
