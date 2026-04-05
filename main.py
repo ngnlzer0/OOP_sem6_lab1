@@ -1,4 +1,6 @@
 import os
+import logging
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader
 
@@ -6,6 +8,17 @@ from app.controllers.auth_controller import AuthController
 from app.controllers.car_controller import CarController
 from app.controllers.request_controller import RequestController
 from app.controllers.driver_controller import DriverController
+
+
+# Налаштовуємо базовий формат логування
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-8s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+# Створюємо об'єкт логера для цього файлу
+logger = logging.getLogger(__name__)
 
 DB_URL = "dbname=test_app user=midnight password=12345678 host=DB"
 env = Environment(loader=FileSystemLoader('app/views'))
@@ -103,5 +116,5 @@ class AutobazaHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(os.environ.get('APP_PORT', 7200))
     server = HTTPServer(('0.0.0.0', port), AutobazaHandler)
-    print(f"Сервер Автобази запущено на порту {port}...")
+    logger.info(f"Сервер Автобази запущено на порту {port}...")
     server.serve_forever()

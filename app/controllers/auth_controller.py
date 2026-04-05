@@ -1,9 +1,13 @@
 import uuid
 import urllib.parse
+import urllib.parse
+import logging
+
 from http.cookies import SimpleCookie
 from app.DAO.user_dao import UserDAO
-import uuid
-import urllib.parse
+
+
+logger = logging.getLogger(__name__)
 
 
 class AuthController:

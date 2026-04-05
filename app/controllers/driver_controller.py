@@ -1,5 +1,8 @@
 import urllib.parse
 from app.DAO.driver_dao import DriverDAO
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DriverController:
@@ -33,7 +36,7 @@ class DriverController:
             dao = DriverDAO(self.db_url)
             dao.link_driver(user_id, car_id, passport)
         except Exception as e:
-            print(f"Помилка закріплення водія: {e}")
+            logger.error(f"Помилка закріплення водія: {e}")
 
         # Повертаємо на головну
         handler.send_response(302)

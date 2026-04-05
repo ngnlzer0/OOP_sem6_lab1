@@ -1,7 +1,11 @@
-# app/controllers/request_controller.py
 import urllib.parse
+import logging
+
 from app.DAO.request_dao import RequestDAO
 from app.DAO.car_dao import CarDAO
+from app.DAO.trip_dao import TripDAO
+
+logger = logging.getLogger(__name__)
 
 
 class RequestController:
@@ -43,9 +47,6 @@ class RequestController:
         handler.end_headers()
 
     def render_assign_form(self, handler):
-        import urllib.parse
-        from app.DAO.request_dao import RequestDAO
-        from app.DAO.car_dao import CarDAO
 
         try:
             query_components = urllib.parse.parse_qs(urllib.parse.urlparse(handler.path).query)
@@ -75,9 +76,6 @@ class RequestController:
 
 
     def assign_request(self, handler, post_data):
-        import urllib.parse
-        from app.DAO.trip_dao import TripDAO
-        from app.DAO.request_dao import RequestDAO
 
         parsed_data = urllib.parse.parse_qs(post_data)
         req_id = int(parsed_data.get('request_id', [0])[0])
@@ -92,7 +90,7 @@ class RequestController:
             req_dao = RequestDAO(self.db_url)
             req_dao.update_status(req_id, 'assigned')
         except Exception as e:
-            print(f"Помилка створення рейсу: {e}")
+            logger.error(f"Помилка створення рейсу: {e}")
 
         # Повертаємо диспетчера на головну сторінку
         handler.send_response(302)
@@ -100,7 +98,6 @@ class RequestController:
         handler.end_headers()
 
     def get_my_trips(self, handler, user_id):
-        from app.DAO.trip_dao import TripDAO
         try:
             dao = TripDAO(self.db_url)
             trips = dao.get_driver_trips(user_id)
@@ -114,8 +111,6 @@ class RequestController:
             handler.send_error(500, f"Помилка БД: {e}")
 
     def complete_trip(self, handler, post_data):
-        import urllib.parse
-        from app.DAO.trip_dao import TripDAO
 
         parsed_data = urllib.parse.parse_qs(post_data)
         trip_id = int(parsed_data.get('trip_id', [0])[0])
@@ -128,14 +123,13 @@ class RequestController:
             dao = TripDAO(self.db_url)
             dao.complete_trip(trip_id, car_condition)
         except Exception as e:
-            print(f"Помилка завершення рейсу: {e}")
+            logger.error(f"Помилка завершення рейсу: {e}")
 
         handler.send_response(302)
         handler.send_header('Location', '/my_trips')
         handler.end_headers()
 
     def get_history(self, handler):
-        from app.DAO.trip_dao import TripDAO
         try:
             dao = TripDAO(self.db_url)
             trips = dao.get_all_trips_history()

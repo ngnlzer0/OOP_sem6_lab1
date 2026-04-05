@@ -1,5 +1,10 @@
-from app.DAO.car_dao import CarDAO
 import urllib.parse
+import logging
+import urllib.parse
+
+from app.DAO.car_dao import CarDAO
+
+logger = logging.getLogger(__name__)
 
 
 class CarController:
@@ -21,7 +26,7 @@ class CarController:
             # Додаємо user_role, щоб навігація диспетчера працювала
             handler.wfile.write(template.render(cars=cars, user_role='dispatcher').encode('utf-8'))
         except Exception as e:
-            handler.send_error(500, f"Помилка БД: {e}")
+            logger.error(f"Помилка БД при створенні авто: {e}")
 
     def render_create_form(self, handler):
         template = self.env.get_template('create_car.html')
@@ -31,8 +36,6 @@ class CarController:
         handler.wfile.write(template.render().encode('utf-8'))
 
     def create_car(self, handler, post_data):
-        import urllib.parse
-        from app.DAO.car_dao import CarDAO
 
         parsed_data = urllib.parse.parse_qs(post_data)
         model = parsed_data.get('model', [''])[0]
@@ -44,7 +47,7 @@ class CarController:
             dao = CarDAO(self.db_url)
             dao.create_car(model, car_type, fuel_level, capacity)
         except Exception as e:
-            print(f"Помилка створення авто: {e}")
+            logger.error(f"Помилка БД при створенні авто: {e}")
 
         # Після додавання перекидаємо назад в автопарк
         handler.send_response(302)
