@@ -46,3 +46,14 @@ class TripDAO:
                 # Виконуємо всі 3 оновлення за один раз
                 cur.execute(query, (trip_id, trip_id, car_condition, trip_id))
                 conn.commit()
+
+    def create_trip_by_car(self, request_id, car_id):
+        """Створює рейс, автоматично знаходячи водія за вибраним авто"""
+        query = """
+            INSERT INTO trip (request_id, driver_id)
+            SELECT %s, id FROM driver WHERE car_id = %s
+        """
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (request_id, car_id))
+                conn.commit()
