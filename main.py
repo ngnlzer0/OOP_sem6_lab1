@@ -20,6 +20,8 @@ class AutobazaHandler(BaseHTTPRequestHandler):
         # 1. Відкриті маршрути (не потребують авторизації)
         if self.path == '/login':
             return auth_ctrl.render_login(self)
+        if self.path == '/register':
+            return auth_ctrl.render_register(self)
         if self.path == '/logout':
             return auth_ctrl.logout(self)
 
@@ -47,9 +49,11 @@ class AutobazaHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length).decode('utf-8')
 
         # Відкритий POST-маршрут
+        # Відкриті POST-маршрути
         if self.path == '/login':
             return auth_ctrl.login(self, post_data)
-
+        if self.path == '/register':
+            return auth_ctrl.register(self, post_data)
         # Middleware
         if not auth_ctrl.check_auth(self):
             self.send_response(403)

@@ -1,6 +1,7 @@
 import uuid
 import urllib.parse
 from http.cookies import SimpleCookie
+from app.DAO.user_dao import UserDAO
 
 
 class AuthController:
@@ -32,20 +33,44 @@ class AuthController:
         handler.wfile.write(template.render(error=error).encode('utf-8'))
 
     def login(self, handler, post_data):
+        import uuid
+        import urllib.parse
+        from app.dao.user_dao import UserDAO
+
+        # Беремо URL бази даних з контролера (або можна передавати з main.py)
+        # Для простоти поки захардкодимо підключення тут, або використай константу
+        db_url = "dbname=test_app user=midnight password=12345678 host=DB"
+
         parsed_data = urllib.parse.parse_qs(post_data)
         login = parsed_data.get('login', [''])[0]
         password = parsed_data.get('password', [''])[0]
 
-        # TODO: Замінити на виклик UserDAO
-        if login == "admin" and password == "123":
+        # 1. Звертаємося до бази даних
+        user_dao = UserDAO(db_url)
+        user_data = user_dao.authenticate(login, password)
+
+        # 2. Якщо користувача знайдено
+        if user_data:
             session_id = str(uuid.uuid4())
-            self.sessions[session_id] = {'login': login, 'role': 'dispatcher'}
+            # Записуємо в сесію всю важливу інфу, включаючи роль
+            self.sessions[session_id] = {
+                'id': user_data['id'],
+                'login': user_data['login'],
+                'role': user_data['role']
+            }
 
             handler.send_response(302)
             handler.send_header('Set-Cookie', f'session_id={session_id}; Path=/; HttpOnly')
-            handler.send_header('Location', '/')
+
+            # 3. РОЗПОДІЛ РОЛЕЙ: Водіїв кидаємо в їхній кабінет, диспетчерів - на головну
+            if user_data['role'] == 'driver':
+                handler.send_header('Location', '/my_trips')
+            else:
+                handler.send_header('Location', '/')
+
             handler.end_headers()
         else:
+            # Якщо логін/пароль неправильні
             self.render_login(handler, error="Невірний логін або пароль")
 
     def logout(self, handler):
@@ -53,3 +78,31 @@ class AuthController:
         handler.send_header('Set-Cookie', 'session_id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
         handler.send_header('Location', '/login')
         handler.end_headers()
+
+    def render_register(self, handler, error=None):
+        template = self.env.get_template('register.html')
+        handler.send_response(200)
+        handler.send_header("Content-type", "text/html; charset=utf-8")
+        handler.end_headers()
+        handler.wfile.write(template.render(error=error).encode('utf-8'))
+
+    def register(self, handler, post_data):
+
+        db_url = "dbname=test_app user=midnight password=12345678 host=DB"
+
+        parsed_data = urllib.parse.parse_qs(post_data)
+        login = parsed_data.get('login', [''])[0]
+        password = parsed_data.get('password', [''])[0]
+        role = parsed_data.get('role', ['dispatcher'])[0]
+
+        user_dao = UserDAO(db_url)
+        new_user_id = user_dao.create_user(login, password, role)
+
+        if new_user_id:
+            # Якщо реєстрація успішна - перенаправляємо на сторінку входу
+            handler.send_response(302)
+            handler.send_header('Location', '/login')
+            handler.end_headers()
+        else:
+            # Якщо логін вже зайнятий
+            self.render_register(handler, error="Цей логін вже зайнятий. Виберіть інший.")
