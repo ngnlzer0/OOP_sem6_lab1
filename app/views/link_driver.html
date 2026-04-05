@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Працевлаштування водія - Автобаза{% endblock %}
+
+{% block content %}
+    <h2>Закріпити авто за водієм</h2>
+
+    <form action="/link_driver" method="POST" style="max-width: 400px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+
+        <div style="margin-bottom: 15px;">
+            <label><strong>Оберіть водія (без авто):</strong></label><br>
+            <select name="user_id" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                {% for user in users %}
+                    <option value="{{ user.id }}">Логін: {{ user.login }}</option>
+                {% else %}
+                    <option value="" disabled selected>Немає вільних водіїв</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label><strong>Оберіть автомобіль:</strong></label><br>
+            <select name="car_id" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                {% for car in cars %}
+                    <option value="{{ car.id }}">{{ car.model }} ({{ car.type }})</option>
+                {% else %}
+                    <option value="" disabled selected>Немає вільних автомобілів</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label><strong>Номер паспорта водія:</strong></label><br>
+            <input type="text" name="passport" placeholder="Напр. KV123456" required style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; background: #3498db;">Закріпити</button>
+    </form>
+{% endblock %}

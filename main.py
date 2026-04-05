@@ -5,6 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 from app.controllers.auth_controller import AuthController
 from app.controllers.car_controller import CarController
 from app.controllers.request_controller import RequestController
+from app.controllers.driver_controller import DriverController
 
 DB_URL = "dbname=test_app user=midnight password=12345678 host=DB"
 env = Environment(loader=FileSystemLoader('app/views'))
@@ -13,6 +14,7 @@ env = Environment(loader=FileSystemLoader('app/views'))
 auth_ctrl = AuthController(env)
 car_ctrl = CarController(env, DB_URL)
 req_ctrl = RequestController(env, DB_URL)
+driver_ctrl = DriverController(env, DB_URL)
 
 class AutobazaHandler(BaseHTTPRequestHandler):
 
@@ -49,6 +51,11 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             car_ctrl.get_cars(self)
         elif self.path == '/create_car':
             car_ctrl.render_create_form(self)
+        elif self.path == '/link_driver':
+            if user and user['role'] == 'dispatcher':
+                driver_ctrl.render_link_form(self)
+            else:
+                self.send_error(403, "Forbidden")
         else:
             self.send_error(404, "Not Found") # Виправили на англійську
 
@@ -75,6 +82,8 @@ class AutobazaHandler(BaseHTTPRequestHandler):
             req_ctrl.assign_request(self, post_data)
         elif self.path == '/create_car':
             car_ctrl.create_car(self, post_data)
+        elif self.path == '/link_driver':
+            driver_ctrl.create_link(self, post_data)
         else:
             self.send_error(404, "Сторінку не знайдено")
 
