@@ -109,7 +109,7 @@ class RequestController:
             handler.send_response(200)
             handler.send_header("Content-type", "text/html; charset=utf-8")
             handler.end_headers()
-            handler.wfile.write(template.render(trips=trips).encode('utf-8'))
+            handler.wfile.write(template.render(trips=trips, user_role='driver').encode('utf-8'))
         except Exception as e:
             handler.send_error(500, f"Помилка БД: {e}")
 

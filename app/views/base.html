@@ -70,10 +70,15 @@
     <header>
         <div class="logo">🚛 Диспетчерська "Автобаза"</div>
         <nav>
-            <a href="/">Активні заявки</a>
-            <a href="/cars">Парк автомобілів</a>
-            <a href="/logout" style="color: #e74c3c;">Вийти</a>
-        </nav>
+    {% if user_role == 'driver' %}
+        <a href="/my_trips" style="color: white; margin-right: 15px; text-decoration: none;">Мої рейси</a>
+    {% else %}
+        <a href="/" style="color: white; margin-right: 15px; text-decoration: none;">Активні заявки</a>
+        <a href="/cars" style="color: white; margin-right: 15px; text-decoration: none;">Парк автомобілів</a>
+        <a href="/link_driver" style="color: white; margin-right: 15px; text-decoration: none; font-weight: bold;">Закріпити водія</a>
+    {% endif %}
+    <a href="/logout" style="color: #e74c3c; text-decoration: none;">Вийти</a>
+</nav>
     </header>
 
     <div class="container">
